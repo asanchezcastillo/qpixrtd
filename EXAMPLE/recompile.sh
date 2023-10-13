@@ -27,4 +27,4 @@ make
 
 cp ../single_muon.root .
 
-cp ../../source/p* .
+cp ../../p* .

@@ -419,7 +419,7 @@ namespace Qpix {
                 std::vector<int> DetectedNum(fNOpChannels);
                 SemiAnalyticalModel::Point_t ScintPoint{start_x, start_y, start_z};
                 semi->detectedDirectVisibilities(OpDetVisibilities, ScintPoint);
-                semi->detectedNumPhotons(DetectedNum, OpDetVisibilities, Nphoton);
+                semi->detectedNumPhotons(DetectedNum, OpDetVisibilities, energy_deposit*24000);
                 
                 for (int channel = 0 ; channel< DetectedNum.size() ; channel++)
                 {   
@@ -461,11 +461,15 @@ namespace Qpix {
     // Initialize objects related to light simulation
     void ROOTFileManager::InitializeLight()
     {
-        std::ifstream param_file("params.json");
-        OpParams = json::parse(param_file);
         PropTime = std::make_unique<PropagationTimeModel>(OpParams); //Initialize PropagationTimeModel object
         fNOpChannels = OpParams["nOpDet"];
         semi = std::make_unique<SemiAnalyticalModel>(OpParams); //Initialize SemiAnalyticalModel object
         SavedPhotons.resize(fNOpChannels); 
     }//InitializeLight
+
+    void ROOTFileManager::ReadJson()
+    {   
+        std::ifstream param_file("params.json");
+        OpParams = json::parse(param_file);
+    }
 }
