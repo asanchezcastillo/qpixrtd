@@ -26,17 +26,17 @@
 
 // constructor
 PropagationTimeModel::PropagationTimeModel(json OpParams)
-  :   nOpDets{OpParams["nOpDet"]},
-  fstep_size{OpParams["StepSize"]},
-  fmax_d{OpParams["max_d"]},
-  fmin_d{OpParams["min_d"]},
-  tau_fast{OpParams["tau_fast"]},
-  tau_slow{OpParams["tau_slow"]},
-  scint_ratio{OpParams["scint_ratio"]},
-  fvuv_vgroup_mean{OpParams["VUVGroupMean"]},
-  fvuv_vgroup_max{OpParams["VUVGroupMax"]},
-  fangle_bin_timing_vuv{OpParams["angle_bin_timing"]},
-  geometryfile{OpParams["geometry_file"]}
+  :   nOpDets{OpParams["LightParameters"]["nOpDet"]},
+  fstep_size{OpParams["LightParameters"]["StepSize"]},
+  fmax_d{OpParams["LightParameters"]["max_d"]},
+  fmin_d{OpParams["LightParameters"]["min_d"]},
+  tau_fast{OpParams["LightParameters"]["tau_fast"]},
+  tau_slow{OpParams["LightParameters"]["tau_slow"]},
+  scint_ratio{OpParams["LightParameters"]["scint_ratio"]},
+  fvuv_vgroup_mean{OpParams["LightParameters"]["VUVGroupMean"]},
+  fvuv_vgroup_max{OpParams["LightParameters"]["VUVGroupMax"]},
+  fangle_bin_timing_vuv{OpParams["LightParameters"]["angle_bin_timing"]},
+  geometryfile{OpParams["LightParameters"]["geometry_file"]}
 {
   // initialise parameters and geometry
   Initialization(OpParams);
@@ -46,73 +46,73 @@ PropagationTimeModel::PropagationTimeModel(json OpParams)
 void PropagationTimeModel::Initialization(json OpParams)
 {
   // Initialize the parameters for the Propagation time. I'm sure there's a way more efficient way of doing it.
-   for (size_t i = 0; i < std::size(OpParams["Distances_landau"]); i++) 
+   for (size_t i = 0; i < std::size(OpParams["LightParameters"]["Distances_landau"]); i++) 
   {
    std::vector<double> row_params;
-   for (size_t j=0; j<std::size(OpParams["Distances_landau"][0]); j++ )
+   for (size_t j=0; j<std::size(OpParams["LightParameters"]["Distances_landau"][0]); j++ )
    {
-     row_params.push_back( static_cast< double >(OpParams["Distances_landau"][i][j]));
+     row_params.push_back( static_cast< double >(OpParams["LightParameters"]["Distances_landau"][i][j]));
    }
    fparameters[0].push_back(row_params);
   } //end par0
 
-    for (size_t i = 0; i < std::size(OpParams["Norm_over_entries1"]); i++) 
+    for (size_t i = 0; i < std::size(OpParams["LightParameters"]["Norm_over_entries1"]); i++) 
   {
    std::vector<double> row_params;
-   for (size_t j=0; j<std::size(OpParams["Norm_over_entries1"][0]); j++ )
+   for (size_t j=0; j<std::size(OpParams["LightParameters"]["Norm_over_entries1"][0]); j++ )
    {
-     row_params.push_back( static_cast< double >(OpParams["Norm_over_entries1"][i][j]));
+     row_params.push_back( static_cast< double >(OpParams["LightParameters"]["Norm_over_entries1"][i][j]));
    }
    fparameters[1].push_back(row_params);
   } //end par1
 
-    for (size_t i = 0; i < std::size(OpParams["Mpv1"]); i++) 
+    for (size_t i = 0; i < std::size(OpParams["LightParameters"]["Mpv1"]); i++) 
   {
    std::vector<double> row_params;
-   for (size_t j=0; j<std::size(OpParams["Mpv1"][0]); j++ )
+   for (size_t j=0; j<std::size(OpParams["LightParameters"]["Mpv1"][0]); j++ )
    {
-     row_params.push_back( static_cast< double >(OpParams["Mpv1"][i][j]));
+     row_params.push_back( static_cast< double >(OpParams["LightParameters"]["Mpv1"][i][j]));
    }
    fparameters[2].push_back(row_params);
   } //end par2
 
-    for (size_t i = 0; i < std::size(OpParams["Width1"]); i++) 
+    for (size_t i = 0; i < std::size(OpParams["LightParameters"]["Width1"]); i++) 
   {
    std::vector<double> row_params;
-   for (size_t j=0; j<std::size(OpParams["Width1"][0]); j++ )
+   for (size_t j=0; j<std::size(OpParams["LightParameters"]["Width1"][0]); j++ )
    {
-     row_params.push_back( static_cast< double >(OpParams["Width1"][i][j]));
+     row_params.push_back( static_cast< double >(OpParams["LightParameters"]["Width1"][i][j]));
    }
    fparameters[3].push_back(row_params);
   } //end par3
 
-    for (size_t i = 0; i < std::size(OpParams["Norm_over_entries2"]); i++) 
+    for (size_t i = 0; i < std::size(OpParams["LightParameters"]["Norm_over_entries2"]); i++) 
   {
    std::vector<double> row_params;
-   for (size_t j=0; j<std::size(OpParams["Norm_over_entries2"][0]); j++ )
+   for (size_t j=0; j<std::size(OpParams["LightParameters"]["Norm_over_entries2"][0]); j++ )
    {
-     row_params.push_back( static_cast< double >(OpParams["Norm_over_entries2"][i][j]));
+     row_params.push_back( static_cast< double >(OpParams["LightParameters"]["Norm_over_entries2"][i][j]));
    }
    fparameters[4].push_back(row_params);
   } //end par2
 
 
-    for (size_t i = 0; i < std::size(OpParams["Mpv2"]); i++) 
+    for (size_t i = 0; i < std::size(OpParams["LightParameters"]["Mpv2"]); i++) 
   {
    std::vector<double> row_params;
-   for (size_t j=0; j<std::size(OpParams["Mpv2"][0]); j++ )
+   for (size_t j=0; j<std::size(OpParams["LightParameters"]["Mpv2"][0]); j++ )
    {
-     row_params.push_back( static_cast< double >(OpParams["Mpv2"][i][j]));
+     row_params.push_back( static_cast< double >(OpParams["LightParameters"]["Mpv2"][i][j]));
    }
    fparameters[5].push_back(row_params);
   } //end par5
 
-    for (size_t i = 0; i < std::size(OpParams["Width2"]); i++) 
+    for (size_t i = 0; i < std::size(OpParams["LightParameters"]["Width2"]); i++) 
   {
    std::vector<double> row_params;
-   for (size_t j=0; j<std::size(OpParams["Width2"][0]); j++ )
+   for (size_t j=0; j<std::size(OpParams["LightParameters"]["Width2"][0]); j++ )
    {
-     row_params.push_back( static_cast< double >(OpParams["Width2"][i][j]));
+     row_params.push_back( static_cast< double >(OpParams["LightParameters"]["Width2"][i][j]));
    }
    fparameters[6].push_back(row_params);
   } //end par6

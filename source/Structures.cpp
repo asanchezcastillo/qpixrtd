@@ -53,25 +53,25 @@ namespace Qpix
         std::ifstream param_file("params.json");
         nlohmann::json QPixParamsFile = nlohmann::json::parse(param_file);
 
-        Qpix_params->Wvalue = QPixParamsFile["QPix"]["Wvalue"]; // in eV
-        Qpix_params->E_vel = QPixParamsFile["QPix"]["E_vel"]; // cm/s
-        Qpix_params->DiffusionL = QPixParamsFile["QPix"]["DiffusionL"];  //cm**2/s
-        Qpix_params->DiffusionT = QPixParamsFile["QPix"]["DiffusionT"]; //cm**2/s
-        Qpix_params->Life_Time = QPixParamsFile["QPix"]["Life_Time"]; // in s
+        Qpix_params->Wvalue = QPixParamsFile["ChargeParameters"]["Wvalue"]; // in eV
+        Qpix_params->E_vel = QPixParamsFile["ChargeParameters"]["E_vel"]; // cm/s
+        Qpix_params->DiffusionL = QPixParamsFile["ChargeParameters"]["DiffusionL"];  //cm**2/s
+        Qpix_params->DiffusionT = QPixParamsFile["ChargeParameters"]["DiffusionT"]; //cm**2/s
+        Qpix_params->Life_Time = QPixParamsFile["ChargeParameters"]["Life_Time"]; // in s
 
         // Read out plane size in cm
-        Qpix_params->Readout_Dim = QPixParamsFile["QPix"]["Readout_Dim"];
-        Qpix_params->Pix_Size = QPixParamsFile["QPix"]["Pix_Size"];
+        Qpix_params->Readout_Dim = QPixParamsFile["ChargeParameters"]["Readout_Dim"];
+        Qpix_params->Pix_Size = QPixParamsFile["ChargeParameters"]["Pix_Size"];
 
         // Number of electrons for reset
-        Qpix_params->Reset = QPixParamsFile["QPix"]["Reset"];
+        Qpix_params->Reset = QPixParamsFile["ChargeParameters"]["Reset"];
         // time in ns
 
-        Qpix_params->Sample_time = QPixParamsFile["QPix"]["Sample_time"]; // in s 
-        Qpix_params->Buffer_time = QPixParamsFile["QPix"]["Buffer_time"]; // in s 
-        Qpix_params->Dead_time = QPixParamsFile["QPix"]["Dead_time"]; // in s 
-        Qpix_params->Charge_loss = QPixParamsFile["QPix"]["Charge_loss"];
-        Qpix_params->Recombination = QPixParamsFile["QPix"]["Recombination"];
+        Qpix_params->Sample_time = QPixParamsFile["ChargeParameters"]["Sample_time"]; // in s 
+        Qpix_params->Buffer_time = QPixParamsFile["ChargeParameters"]["Buffer_time"]; // in s 
+        Qpix_params->Dead_time = QPixParamsFile["ChargeParameters"]["Dead_time"]; // in s 
+        Qpix_params->Charge_loss = QPixParamsFile["ChargeParameters"]["Charge_loss"];
+        Qpix_params->Recombination = QPixParamsFile["ChargeParameters"]["Recombination"];
     }//set_Qpix_Paramaters
 
     // A nice printing function 

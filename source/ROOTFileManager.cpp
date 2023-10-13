@@ -216,12 +216,9 @@ namespace Qpix {
     //--------------------------------------------------------------------------
     double ROOTFileManager::Birks_Model(double dEdx, double const EField) 
     {
-
-        double fRecombinationA = 8e-1 ; //
-        double fRecombinationK = 4.86e-2 ; //
         double Recombination;
         Recombination = fRecombinationA / (1. + dEdx * fRecombinationK / EField);
-
+     
         return Recombination;
     }
 
@@ -232,10 +229,6 @@ namespace Qpix {
         // Escaping electron fraction for LArQL
         // Recombination and LArQL parameters taken from 
         //https://cdcvs.fnal.gov/redmine/projects/larsoft/wiki/LArQL_algorithm
-        double fLarqlChi0A = 3.38427e-3;
-        double fLarqlChi0B = -6.57037;
-        double fLarqlChi0C = 1.88418;
-        double fLarqlChi0D = 1.29379e-4;
         return fLarqlChi0A / (fLarqlChi0B + std::exp(fLarqlChi0C + fLarqlChi0D * dEdx));
     }
 
@@ -245,8 +238,7 @@ namespace Qpix {
         // Low EF correction for LArQL
         // Recombination and LArQL parameters taken from 
         //https://cdcvs.fnal.gov/redmine/projects/larsoft/wiki/LArQL_algorithm
-        double fLarqlAlpha = 3.72e-2;
-        double fLarqlBeta = 1.24e-2;
+
         return std::exp(-EF / (fLarqlAlpha * std::log(dEdx) + fLarqlBeta));
     }
 
@@ -290,8 +282,9 @@ namespace Qpix {
         if(detector_configuration_) std::cout << "Using HD-like configuration " << std::endl; 
         else std::cout << "Using VD-like configuration " << std::endl; 
 
-        bool LightSimulation=true;
-        if(LightSimulation) this->InitializeLight();
+        this->ReadJson();
+
+        if(SimulateLight) this->InitializeLight();
 
         int indexer = 0;
         // loop over all hits in the event
@@ -323,17 +316,11 @@ namespace Qpix {
             // Set up the paramaters for the recombiataion 
             double const dEdx = energy_deposit/length_of_hit;        
             double Recombination;
-            double fWion = 0.0000236016; // (MeV)
             double Nion = energy_deposit/fWion;
-            double fWph = 1.94e-5; // (MeV)
             double Nquanta = energy_deposit/fWph;
-            double const EField = 0.5; // (kV/cm)
 
             double Nelectron;
             double Nphoton;
-
-            bool UseModifiedBox = false;
-            bool LArQLCorrections = true;
             
             if (Qpix_params->Recombination) // If we accont for recombination
             {
@@ -378,42 +365,46 @@ namespace Qpix {
             double electron_x, electron_y, electron_z;
             double T_drift, sigma_L, sigma_T;
 
-            // Loop through the electrons 
-            for (int i = 0; i < Nelectron; i++) 
-            {
-                // calculate drift time for diffusion 
-                T_drift = electron_loc_z / Qpix_params->E_vel;
-                // electron lifetime
-                if (Qpix::RandomUniform() >= exp(-T_drift/Qpix_params->Life_Time)){continue;}
-                
-                // diffuse the electrons position
-                sigma_T = sqrt(2*Qpix_params->DiffusionT*T_drift);
-                sigma_L = sqrt(2*Qpix_params->DiffusionL*T_drift);
-                electron_x = Qpix::RandomNormal(electron_loc_x,sigma_T);
-                electron_y = Qpix::RandomNormal(electron_loc_y,sigma_T);
-                electron_z = Qpix::RandomNormal(electron_loc_z,sigma_L);
-		
-                // add the electron to the vector.
-                hit_e.push_back(Qpix::ELECTRON());
-                
-                // convert the electrons x,y to a pixel index
-                int Pix_Xloc, Pix_Yloc;
-                Pix_Xloc = (int) ceil(electron_x / Qpix_params->Pix_Size);
-                Pix_Yloc = (int) ceil(electron_y / Qpix_params->Pix_Size);
 
-                hit_e[indexer].Pix_ID = (int)(Pix_Xloc*10000+Pix_Yloc);
-                hit_e[indexer].time = electron_loc_t + ( electron_z / Qpix_params->E_vel );
-                hit_e[indexer].Trk_ID = hit_trk_id;
-                
-                // Move to the next electron
-                electron_loc_x += step_x;
-                electron_loc_y += step_y;
-                electron_loc_z += step_z;
-                electron_loc_t += step_t;
-                indexer += 1;
+            if(SimulateCharge)
+            {
+                // Loop through the electrons 
+                for (int i = 0; i < Nelectron; i++) 
+                {
+                    // calculate drift time for diffusion 
+                    T_drift = electron_loc_z / Qpix_params->E_vel;
+                    // electron lifetime
+                    if (Qpix::RandomUniform() >= exp(-T_drift/Qpix_params->Life_Time)){continue;}
+                    
+                    // diffuse the electrons position
+                    sigma_T = sqrt(2*Qpix_params->DiffusionT*T_drift);
+                    sigma_L = sqrt(2*Qpix_params->DiffusionL*T_drift);
+                    electron_x = Qpix::RandomNormal(electron_loc_x,sigma_T);
+                    electron_y = Qpix::RandomNormal(electron_loc_y,sigma_T);
+                    electron_z = Qpix::RandomNormal(electron_loc_z,sigma_L);
+            
+                    // add the electron to the vector.
+                    hit_e.push_back(Qpix::ELECTRON());
+                    
+                    // convert the electrons x,y to a pixel index
+                    int Pix_Xloc, Pix_Yloc;
+                    Pix_Xloc = (int) ceil(electron_x / Qpix_params->Pix_Size);
+                    Pix_Yloc = (int) ceil(electron_y / Qpix_params->Pix_Size);
+
+                    hit_e[indexer].Pix_ID = (int)(Pix_Xloc*10000+Pix_Yloc);
+                    hit_e[indexer].time = electron_loc_t + ( electron_z / Qpix_params->E_vel );
+                    hit_e[indexer].Trk_ID = hit_trk_id;
+                    
+                    // Move to the next electron
+                    electron_loc_x += step_x;
+                    electron_loc_y += step_y;
+                    electron_loc_z += step_z;
+                    electron_loc_t += step_t;
+                    indexer += 1;
+                }
             }
 
-            if(LightSimulation)
+            if(SimulateLight)
             {
                 std::vector<double> OpDetVisibilities;
                 std::vector<int> DetectedNum(fNOpChannels);
@@ -461,15 +452,30 @@ namespace Qpix {
     // Initialize objects related to light simulation
     void ROOTFileManager::InitializeLight()
     {
-        PropTime = std::make_unique<PropagationTimeModel>(OpParams); //Initialize PropagationTimeModel object
-        fNOpChannels = OpParams["nOpDet"];
-        semi = std::make_unique<SemiAnalyticalModel>(OpParams); //Initialize SemiAnalyticalModel object
+        PropTime = std::make_unique<PropagationTimeModel>(SimulationParameters); //Initialize PropagationTimeModel object
+        fNOpChannels = SimulationParameters["nOpDet"];
+        semi = std::make_unique<SemiAnalyticalModel>(SimulationParameters); //Initialize SemiAnalyticalModel object
         SavedPhotons.resize(fNOpChannels); 
     }//InitializeLight
 
     void ROOTFileManager::ReadJson()
-    {   
+    {           
         std::ifstream param_file("params.json");
-        OpParams = json::parse(param_file);
+        SimulationParameters = json::parse(param_file);
+        SimulateLight =  SimulationParameters["LightSimulation"]; 
+        SimulateCharge =  SimulationParameters["ChargeSimulation"]; 
+        UseModifiedBox = SimulationParameters["UseModifiedBox"];
+        LArQLCorrections = SimulationParameters["LArQLCorrections"];
+        fLarqlChi0A = SimulationParameters["LightParameters"]["fLarqlChi0A"];
+        fLarqlChi0B = SimulationParameters["LightParameters"]["fLarqlChi0B"]; 
+        fLarqlChi0C = SimulationParameters["LightParameters"]["fLarqlChi0C"]; 
+        fLarqlChi0D = SimulationParameters["LightParameters"]["fLarqlChi0D"]; 
+        fLarqlAlpha = SimulationParameters["LightParameters"]["fLarqlAlpha"]; 
+        fLarqlBeta = SimulationParameters["LightParameters"]["fLarqlBeta"]; 
+        fRecombinationA = SimulationParameters["LightParameters"]["fRecombinationA"]; 
+        fRecombinationK = SimulationParameters["LightParameters"]["fRecombinationK"]; 
+        fWion = SimulationParameters["LightParameters"]["fWion"]; 
+        fWph = SimulationParameters["LightParameters"]["fWph"];
+        EField = SimulationParameters["LightParameters"]["EF"];
     }
 }

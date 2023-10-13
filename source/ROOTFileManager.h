@@ -57,6 +57,7 @@ namespace Qpix {
             void Get_Event(int, Qpix::Qpix_Paramaters *, std::vector< Qpix::ELECTRON > &);
             void AddEvent(std::vector<Qpix::Pixel_Info> const);
             void SavePhotons(std::vector<SimPhotons> photonHitCollection);
+            void ReadJson();
 
 
         private:
@@ -175,8 +176,23 @@ namespace Qpix {
             //--------------------------------------------------
             // light simulation objets
             //--------------------------------------------------
-            json OpParams;
+            json SimulationParameters;
+            bool SimulateLight;
+            bool SimulateCharge;
+            bool UseModifiedBox;
+            bool LArQLCorrections;
             unsigned int fNOpChannels;
+            double fLarqlChi0A;
+            double fLarqlChi0B;
+            double fLarqlChi0C;
+            double fLarqlChi0D;
+            double fLarqlAlpha;
+            double fLarqlBeta;
+            double fRecombinationA;
+            double fRecombinationK;
+            double fWion;
+            double fWph;
+            double EField ;
             std::unique_ptr<PropagationTimeModel> PropTime;
             std::unique_ptr<SemiAnalyticalModel> semi;
             std::unique_ptr<std::vector<SimPhotons>> photonCol{new std::vector<SimPhotons>{}};

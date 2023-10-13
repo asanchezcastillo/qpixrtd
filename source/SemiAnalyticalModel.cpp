@@ -8,12 +8,12 @@
 
 // constructor
 SemiAnalyticalModel::SemiAnalyticalModel(json OpParams)
-    : fanode_centre{OpParams["anode_centre"][0],OpParams["anode_centre"][1],OpParams["anode_centre"][2]},
-      fvuv_absorption_length{OpParams["vuv_absorption_length"]},
-      nOpDets{OpParams["nOpDet"]},
-      geometryfile{OpParams["geometry_file"]},
-      fDetectorVDConfiguration{OpParams["DetectorVDConfiguration"]},
-      fdelta_angulo_vuv{OpParams["DeltaAngle"]}
+    : fanode_centre{OpParams["LightParameters"]["anode_centre"][0],OpParams["LightParameters"]["anode_centre"][1],OpParams["LightParameters"]["anode_centre"][2]},
+      fvuv_absorption_length{OpParams["LightParameters"]["vuv_absorption_length"]},
+      nOpDets{OpParams["LightParameters"]["nOpDet"]},
+      geometryfile{OpParams["LightParameters"]["geometry_file"]},
+      fDetectorVDConfiguration{OpParams["LightParameters"]["DetectorVDConfiguration"]},
+      fdelta_angulo_vuv{OpParams["LightParameters"]["DeltaAngle"]}
 
 {
   Initialization(OpParams);
@@ -23,32 +23,32 @@ SemiAnalyticalModel::SemiAnalyticalModel(json OpParams)
 void SemiAnalyticalModel::Initialization(json OpParams)
 {
   //Read GH parameters from json file. (I suspect there might be a more optimal way of doing this)
-  for (size_t i = 0; i < std::size(OpParams["GH_params"]); i++) 
+  for (size_t i = 0; i < std::size(OpParams["LightParameters"]["GH_params"]); i++) 
   {
    std::vector<double> row_params;
-   for (size_t j=0; j<std::size(OpParams["GH_params"][0]); j++ )
+   for (size_t j=0; j<std::size(OpParams["LightParameters"]["GH_params"][0]); j++ )
    {
-     row_params.push_back( static_cast< double >(OpParams["GH_params"][i][j]));
+     row_params.push_back( static_cast< double >(OpParams["LightParameters"]["GH_params"][i][j]));
    }
    fGHparams.push_back(row_params);
   }
   //Read border effect GH params. 
-  for (size_t i = 0; i < std::size(OpParams["GH_border"]); i++) 
+  for (size_t i = 0; i < std::size(OpParams["LightParameters"]["GH_border"]); i++) 
   {
    std::vector<double> row_params;
-   for (size_t j=0; j<std::size(OpParams["GH_border"][0]); j++ )
+   for (size_t j=0; j<std::size(OpParams["LightParameters"]["GH_border"][0]); j++ )
    {
-    row_params.push_back( static_cast< double >(OpParams["GH_border"][i][j]));
+    row_params.push_back( static_cast< double >(OpParams["LightParameters"]["GH_border"][i][j]));
    }
    fGHparams_border.push_back(row_params);
   }
   //Read angle bin for border effects. 
-  for (size_t i = 0; i < std::size(OpParams["GH_border_angle"]); i++) 
+  for (size_t i = 0; i < std::size(OpParams["LightParameters"]["GH_border_angle"]); i++) 
   {
    std::vector<double> row_params;
-   for (size_t j=0; j<std::size(OpParams["GH_border_angle"][0]); j++ )
+   for (size_t j=0; j<std::size(OpParams["LightParameters"]["GH_border_angle"][0]); j++ )
    {
-    row_params.push_back( static_cast< double >(OpParams["GH_border_angle"][i][j]));
+    row_params.push_back( static_cast< double >(OpParams["LightParameters"]["GH_border_angle"][i][j]));
    }
    fGHparams_border_angle.push_back(row_params);
   }
