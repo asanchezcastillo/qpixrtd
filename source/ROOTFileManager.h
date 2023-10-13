@@ -23,6 +23,18 @@
 #include <map>
 #include <set>
 
+#include "SemiAnalyticalModel.h"
+#include "SimPhotons.h"
+#include "PropagationTimeModel.h"
+
+
+#include <iostream>
+#include <vector>
+#include <string>
+#include <fstream>
+
+
+
 namespace Qpix {
 
     class ROOTFileManager {
@@ -39,8 +51,14 @@ namespace Qpix {
 
             void AddMetadata(Qpix::Qpix_Paramaters * const);
             double Modified_Box(double dEdx);
+            double Birks_Model(double dEdx, double const EField);
+            double EscapingEFraction(const double dEdx) const;
+            double FieldCorrection(double const EF, double const dEdx) const;
             void Get_Event(int, Qpix::Qpix_Paramaters *, std::vector< Qpix::ELECTRON > &);
             void AddEvent(std::vector<Qpix::Pixel_Info> const);
+            void SavePhotons(std::vector<SimPhotons> photonHitCollection);
+            void ReadJson();
+
 
         private:
 
@@ -53,6 +71,8 @@ namespace Qpix {
 
             std::vector< int > pixel_x_;
             std::vector< int > pixel_y_;
+            std::vector< double > hit_NElectron_;
+            std::vector< double > hit_NPhoton_;
             std::vector< std::vector < double > > pixel_reset_;
             std::vector< std::vector < double > > pixel_tslr_;
             // std::vector< std::vector< std::vector < int > > > pixel_reset_truth_track_id_;
@@ -66,6 +86,9 @@ namespace Qpix {
             TBranch * tbranch_tslr_;
             TBranch * tbranch_reset_truth_track_id_;
             TBranch * tbranch_reset_truth_weight_;
+            TBranch * tbranch_nelectrons_;
+            TBranch * tbranch_nphotons_;
+            TBranch * tbranch_savedphotons_;
 
             //--------------------------------------------------
             // existing branch variables
@@ -76,6 +99,7 @@ namespace Qpix {
             int number_particles_;
             int number_hits_;
             double energy_deposit_;
+            bool detector_configuration_;
 
             std::vector< int >    * particle_track_id_;
             std::vector< int >    * particle_parent_track_id_;
@@ -144,12 +168,36 @@ namespace Qpix {
             // initialize
             //--------------------------------------------------
             void initialize(std::string const&, std::string const&);
-
+            void InitializeLight();
             //--------------------------------------------------
             // set branch addresses
             //--------------------------------------------------
             void set_branch_addresses(TTree *);
-
+            //--------------------------------------------------
+            // light simulation objets
+            //--------------------------------------------------
+            json SimulationParameters;
+            bool SimulateLight;
+            bool SimulateCharge;
+            bool UseModifiedBox;
+            bool LArQLCorrections;
+            unsigned int fNOpChannels;
+            double fLarqlChi0A;
+            double fLarqlChi0B;
+            double fLarqlChi0C;
+            double fLarqlChi0D;
+            double fLarqlAlpha;
+            double fLarqlBeta;
+            double fRecombinationA;
+            double fRecombinationK;
+            double fWion;
+            double fWph;
+            double EField ;
+            std::unique_ptr<PropagationTimeModel> PropTime;
+            std::unique_ptr<SemiAnalyticalModel> semi;
+            std::unique_ptr<std::vector<SimPhotons>> photonCol{new std::vector<SimPhotons>{}};
+            std::vector<SimPhotons> photonHitCollection{*photonCol};
+            std::vector<std::vector<double>> SavedPhotons;
     };
 
 }

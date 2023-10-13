@@ -24,3 +24,7 @@ cd build
 cmake ..
 
 make
+
+cp ../single_muon.root .
+
+cp ../../p* .
